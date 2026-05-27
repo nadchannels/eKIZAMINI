@@ -28,8 +28,18 @@ export default function AdminGuard() {
       if (snap.exists()) {
         setProfile(snap.data());
       } else {
-        // No profile doc = first superadmin (bootstrapped manually)
-        setProfile({ role: 'superadmin', status: 'active' });
+        // No profile doc = first superadmin
+        import('firebase/firestore').then(({ setDoc }) => {
+          setDoc(doc(db, 'users', user.uid), {
+            role: 'superadmin',
+            status: 'active',
+            name: user.displayName || user.email,
+            email: user.email,
+            createdAt: new Date()
+          }).then(() => {
+            setProfile({ role: 'superadmin', status: 'active' });
+          });
+        });
       }
     });
     return unsub;

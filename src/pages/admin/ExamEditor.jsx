@@ -125,10 +125,13 @@ export default function ExamEditor() {
         payload.createdAt = serverTimestamp();
         await addDoc(collection(db, 'exams'), payload);
       }
-      setSuccess(statusOverride === 'current' ? 'Exam published!' : 'Exam saved!');
+      setSuccess('Exam saved successfully!');
       setTimeout(() => navigate('/admin/dashboard'), 1200);
     } catch (err) {
-      setError('Failed to save. Please try again.');
+      console.error("Save error:", err);
+      const msg = err.message || err.toString();
+      setError('Failed to save: ' + msg);
+      alert('Failed to save: ' + msg);
     } finally {
       setSaving(false);
     }
