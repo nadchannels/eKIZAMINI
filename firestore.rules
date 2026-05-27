@@ -18,9 +18,6 @@ service cloud.firestore {
     function isActiveAdmin() {
       return isSuperAdmin() || isActiveTrainer();
     }
-    function isAssignedFaculty(faculty) {
-      return isSuperAdmin() || getUserData().faculty == faculty || faculty == 'All Faculties';
-    }
 
     // ── Users / Admins ──────────────────────────────────────
     match /users/{uid} {
