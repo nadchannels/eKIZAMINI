@@ -46,7 +46,8 @@ export default function ExamEditor() {
     prepTime: 5,
     duration: 60,
     submissionLink: '',
-    status: 'pending',
+    startDate: new Date(Date.now() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16),
+    endDate: new Date(Date.now() - new Date().getTimezoneOffset() * 60000 + 24 * 3600 * 1000).toISOString().slice(0, 16),
     questions: [newQuestion()],
   });
   const [loading, setLoading] = useState(isEdit);
@@ -115,7 +116,6 @@ export default function ExamEditor() {
     setSaving(true); setError(''); setSuccess('');
     const payload = {
       ...exam,
-      status: statusOverride || exam.status,
       updatedAt: serverTimestamp(),
     };
     try {
@@ -151,12 +151,9 @@ export default function ExamEditor() {
           <p>Build your exam with rich formatting and multiple question types</p>
         </div>
         <div style={{ display: 'flex', gap: 12 }}>
-          <button className="btn btn-secondary" onClick={() => handleSave()} disabled={saving}>
-            <Save size={16} /> Save Draft
-          </button>
-          <button className="btn btn-primary" onClick={() => handleSave('current')} disabled={saving}>
-            {saving ? <span className="spinner" /> : <Send size={16} />}
-            Publish
+          <button className="btn btn-primary" onClick={() => handleSave()} disabled={saving}>
+            {saving ? <span className="spinner" /> : <Save size={16} />}
+            Save Exam
           </button>
         </div>
       </div>
@@ -192,17 +189,27 @@ export default function ExamEditor() {
                   ))}
                 </select>
               </div>
+              </div>
+            </div>
+
+            <div className="grid-2" style={{ marginTop: 16 }}>
               <div className="form-group">
-                <label className="form-label">Status</label>
-                <select
+                <label className="form-label">Start Date & Time</label>
+                <input
+                  type="datetime-local"
                   className="form-input"
-                  value={exam.status}
-                  onChange={(e) => update('status', e.target.value)}
-                >
-                  <option value="pending">Pending</option>
-                  <option value="current">Active / Current</option>
-                  <option value="past">Completed / Past</option>
-                </select>
+                  value={exam.startDate}
+                  onChange={(e) => update('startDate', e.target.value)}
+                />
+              </div>
+              <div className="form-group">
+                <label className="form-label">End Date & Time</label>
+                <input
+                  type="datetime-local"
+                  className="form-input"
+                  value={exam.endDate}
+                  onChange={(e) => update('endDate', e.target.value)}
+                />
               </div>
             </div>
 

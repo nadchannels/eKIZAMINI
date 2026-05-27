@@ -63,9 +63,17 @@ export default function LandingPage() {
     // Load available exams
     setLoadingExams(true);
     setStepPersistent('exams');
-    const q = query(collection(db, 'exams'), where('status', '==', 'current'));
+    const q = query(collection(db, 'exams'));
     const snap = await getDocs(q);
-    const all = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    const now = new Date();
+    const all = snap.docs.map((d) => ({ id: d.id, ...d.data() })).filter(e => {
+       if (e.startDate && e.endDate) {
+          const start = new Date(e.startDate);
+          const end = new Date(e.endDate);
+          return now >= start && now <= end;
+       }
+       return e.status === 'current';
+    });
     // Filter by faculty
     const filtered = all.filter(
       (ex) => ex.faculty === 'All Faculties' || ex.faculty === trainee.faculty

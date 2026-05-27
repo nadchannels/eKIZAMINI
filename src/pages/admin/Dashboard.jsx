@@ -37,11 +37,24 @@ export default function Dashboard() {
 
   useEffect(() => { fetchExams(); }, []);
 
-  const pending = exams.filter((e) => e.status === 'pending');
-  const current = exams.filter((e) => e.status === 'current');
-  const past = exams.filter((e) => e.status === 'past');
+  const examsWithStatus = exams.map(e => {
+    let computedStatus = e.status || 'pending';
+    if (e.startDate && e.endDate) {
+       const now = new Date();
+       const start = new Date(e.startDate);
+       const end = new Date(e.endDate);
+       if (now < start) computedStatus = 'pending';
+       else if (now > end) computedStatus = 'past';
+       else computedStatus = 'current';
+    }
+    return { ...e, computedStatus };
+  });
 
-  const filtered = filter === 'all' ? exams : exams.filter((e) => e.status === filter);
+  const pending = examsWithStatus.filter((e) => e.computedStatus === 'pending');
+  const current = examsWithStatus.filter((e) => e.computedStatus === 'current');
+  const past = examsWithStatus.filter((e) => e.computedStatus === 'past');
+
+  const filtered = filter === 'all' ? examsWithStatus : examsWithStatus.filter((e) => e.computedStatus === filter);
 
   const handleDelete = async (examId) => {
     if (!window.confirm('Delete this exam? This cannot be undone.')) return;
@@ -185,13 +198,13 @@ export default function Dashboard() {
                     <td>{exam.faculty || 'All'}</td>
                     <td>{exam.duration} min</td>
                     <td>
-                      <span className={`badge badge-${exam.status}`}>
-                        {exam.status}
+                      <span className={`badge badge-${exam.computedStatus}`}>
+                        {exam.computedStatus}
                       </span>
                     </td>
                     <td>
                       <div style={{ display: 'flex', gap: 8 }}>
-                        {(exam.status === 'pending' || exam.status === 'current') && (
+                        {(exam.computedStatus === 'pending' || exam.computedStatus === 'current') && (
                           <Link
                             to={`/admin/exam/edit/${exam.id}`}
                             className="btn btn-secondary btn-sm"
