@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, useEffect } from 'react';
 import {
   Bold, Italic, Underline, List, ListOrdered,
   Type, AlignLeft, AlignCenter, AlignRight
@@ -18,6 +18,12 @@ const FONT_SIZES = ['12', '14', '16', '18', '20', '24', '28', '32', '36'];
 
 export default function RichTextEditor({ value, onChange, placeholder }) {
   const editorRef = useRef(null);
+
+  useEffect(() => {
+    if (editorRef.current && value !== editorRef.current.innerHTML) {
+      editorRef.current.innerHTML = value || '';
+    }
+  }, [value]);
 
   const exec = (cmd, val = null) => {
     editorRef.current?.focus();
@@ -111,7 +117,7 @@ export default function RichTextEditor({ value, onChange, placeholder }) {
         suppressContentEditableWarning
         onInput={handleChange}
         onPaste={handlePaste}
-        dangerouslySetInnerHTML={{ __html: value || '' }}
+        onBlur={handleChange}
         data-placeholder={placeholder || 'Start writing your exam content here…'}
       />
     </div>
