@@ -1,0 +1,113 @@
+/* Auth pages shared styles */
+.auth-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  padding: 24px;
+  background: var(--black);
+}
+
+.auth-bg {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+.auth-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.12;
+}
+.auth-orb-1 {
+  width: 500px; height: 500px;
+  background: #ffffff;
+  top: -150px; right: -150px;
+}
+.auth-orb-2 {
+  width: 400px; height: 400px;
+  background: #888888;
+  bottom: -100px; left: -100px;
+}
+
+.auth-card {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 440px;
+  padding: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: rgba(22, 22, 22, 0.9) !important;
+  border: 1px solid rgba(255,255,255,0.08) !important;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+}
+
+.auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.auth-logo {
+  width: 48px; height: 48px;
+  background: var(--white);
+  color: var(--black);
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.auth-title {
+  font-family: var(--font-heading);
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--white);
+  letter-spacing: -0.02em;
+}
+.auth-subtitle {
+  font-size: 0.72rem;
+  color: var(--white-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-top: 2px;
+}
+.auth-divider {
+  height: 1px;
+  background: var(--glass-border);
+}
+.auth-heading {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: -8px;
+}
+.auth-desc {
+  font-size: 0.875rem;
+  color: var(--white-muted);
+  margin-bottom: 4px;
+}
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.auth-link-text {
+  text-align: center;
+  font-size: 0.875rem;
+  color: var(--white-muted);
+}
+.auth-link {
+  color: var(--white);
+  font-weight: 600;
+  border-bottom: 1px solid rgba(255,255,255,0.3);
+  padding-bottom: 1px;
+  transition: var(--transition);
+}
+.auth-link:hover {
+  border-color: var(--white);
+}

@@ -1,0 +1,84 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    function getUserData() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
+    }
+    function isSuperAdmin() {
+      return isSignedIn() && getUserData().role == 'superadmin' && getUserData().status == 'active';
+    }
+    function isActiveTrainer() {
+      return isSignedIn() && getUserData().role == 'trainer' && getUserData().status == 'active';
+    }
+    function isActiveAdmin() {
+      return isSuperAdmin() || isActiveTrainer();
+    }
+    function isAssignedFaculty(faculty) {
+      return isSuperAdmin() || getUserData().faculty == faculty || faculty == 'All Faculties';
+    }
+
+    // ── Users / Admins ──────────────────────────────────────
+    match /users/{uid} {
+      // Anyone can create their own user doc (signup)
+      allow create: if isSignedIn() && request.auth.uid == uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.role == 'trainer';
+
+      // Users can read their own doc
+      allow read: if isSignedIn() && request.auth.uid == uid;
+
+      // Superadmin can read and update all user docs (approve, promote, assign)
+      allow read, update: if isSuperAdmin();
+
+      // Superadmin list all users
+      allow list: if isSuperAdmin();
+
+      // Nobody can delete user docs
+      allow delete: if false;
+    }
+
+    // ── Exams ───────────────────────────────────────────────
+    match /exams/{examId} {
+      // Trainees can read active/current exams (public)
+      allow read: if true;
+
+      // Superadmin can write any exam
+      allow create, update, delete: if isSuperAdmin();
+
+      // Trainers can write exams only for their assigned faculty
+      allow create: if isActiveTrainer()
+        && (request.resource.data.faculty == getUserData().faculty
+            || request.resource.data.faculty == 'All Faculties');
+      allow update: if isActiveTrainer()
+        && (resource.data.faculty == getUserData().faculty
+            || resource.data.faculty == 'All Faculties');
+      allow delete: if isActiveTrainer()
+        && resource.data.faculty == getUserData().faculty;
+    }
+
+    // ── Submissions ─────────────────────────────────────────
+    match /submissions/{submissionId} {
+      // Anyone can create a submission (trainees — no auth)
+      allow create: if true;
+
+      // Superadmin can read/update all submissions
+      allow read, update: if isSuperAdmin();
+
+      // Trainers can only read/update submissions for their faculty's exams
+      allow read, update: if isActiveTrainer();
+
+      // Nobody can delete submissions
+      allow delete: if false;
+    }
+
+    // Deny everything else
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
