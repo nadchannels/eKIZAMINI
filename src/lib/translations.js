@@ -60,20 +60,28 @@ export function initGoogleTranslate() {
  * @param {string} langCode - e.g. 'fr', 'rw', or null for English (restore)
  */
 export function switchLanguage(langCode) {
+  const hasCookie = document.cookie.includes('googtrans');
+
   if (!langCode) {
-    // Restore English — reload without the cookie
-    const frame = document.querySelector('iframe.goog-te-banner-frame');
-    if (frame) {
-      const innerDoc = frame.contentDocument || frame.contentWindow.document;
-      const restore = innerDoc.querySelector('.goog-te-button button');
-      if (restore) restore.click();
-    }
-    // Fallback: clear cookie and reload
-    document.cookie =
-      'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
-    document.cookie =
-      'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' +
-      location.hostname;
+    if (!hasCookie) return; // Already on English, no action needed
+
+    // Restore English — clear cookie
+    document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+    document.cookie = 'googtrans=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/; domain=' + location.hostname;
+
+    try {
+      const frame = document.querySelector('iframe.goog-te-banner-frame');
+      if (frame) {
+        const innerDoc = frame.contentDocument || frame.contentWindow.document;
+        const restore = innerDoc.querySelector('.goog-te-button button');
+        if (restore) {
+           restore.click();
+           return;
+        }
+      }
+    } catch(e) {}
+
+    // Fallback: reload
     location.reload();
     return;
   }

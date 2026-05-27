@@ -17,8 +17,8 @@ const STEPS = ['language', 'info', 'exams'];
 
 export default function LandingPage() {
   const navigate = useNavigate();
-  const [step, setStep] = useState('language');
-  const [lang, setLang] = useState('en');
+  const [step, setStep] = useState(() => sessionStorage.getItem('ek_step') || 'language');
+  const [lang, setLang] = useState(() => sessionStorage.getItem('ek_lang') || 'en');
   const [hasPartner, setHasPartner] = useState(false);
   const [trainee, setTrainee] = useState({ name: '', faculty: '', regNumber: '' });
   const [partner, setPartner] = useState({ name: '', faculty: '', regNumber: '' });
@@ -26,11 +26,18 @@ export default function LandingPage() {
   const [loadingExams, setLoadingExams] = useState(false);
   const [formError, setFormError] = useState('');
 
+  const setStepPersistent = (newStep) => {
+    setStep(newStep);
+    sessionStorage.setItem('ek_step', newStep);
+  };
+
   const handleLangSelect = (code, gtCode) => {
     setLang(code);
+    sessionStorage.setItem('ek_lang', code);
+    setStepPersistent('info');
+    
     if (gtCode) switchLanguage(gtCode);
     else switchLanguage(null);
-    setTimeout(() => setStep('info'), 300);
   };
 
   const handleTraineeChange = (e) =>
@@ -55,7 +62,7 @@ export default function LandingPage() {
     sessionStorage.setItem('ek_partner', hasPartner ? JSON.stringify(partner) : '');
     // Load available exams
     setLoadingExams(true);
-    setStep('exams');
+    setStepPersistent('exams');
     const q = query(collection(db, 'exams'), where('status', '==', 'current'));
     const snap = await getDocs(q);
     const all = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
@@ -121,7 +128,7 @@ export default function LandingPage() {
         {/* ── STEP 2: Trainee Info ──────────────────────────── */}
         {step === 'info' && (
           <div className="landing-card glass-card animate-fade" style={{ maxWidth: 600 }}>
-            <button className="back-btn" onClick={() => setStep('language')}>← Back</button>
+            <button className="back-btn" onClick={() => setStepPersistent('language')}>← Back</button>
             <h2 className="landing-title" style={{ fontSize: '1.75rem' }}>Your Information</h2>
             <p className="landing-desc">Please fill in your details before accessing the exam.</p>
 
@@ -246,7 +253,7 @@ export default function LandingPage() {
         {/* ── STEP 3: Available Exams ───────────────────────── */}
         {step === 'exams' && (
           <div className="animate-fade" style={{ width: '100%', maxWidth: 800 }}>
-            <button className="back-btn" onClick={() => setStep('info')}>← Back</button>
+            <button className="back-btn" onClick={() => setStepPersistent('info')}>← Back</button>
             <h2 className="landing-title" style={{ fontSize: '1.75rem', marginBottom: 8 }}>
               Available Exams
             </h2>
