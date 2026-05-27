@@ -189,7 +189,6 @@ export default function ExamEditor() {
                   ))}
                 </select>
               </div>
-              </div>
             </div>
 
             <div className="grid-2" style={{ marginTop: 16 }}>
