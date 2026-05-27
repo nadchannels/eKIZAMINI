@@ -10,10 +10,13 @@ service cloud.firestore {
       return get(/databases/$(database)/documents/users/$(request.auth.uid)).data;
     }
     function isSuperAdmin() {
-      return isSignedIn() && getUserData().role == 'superadmin' && getUserData().status == 'active';
+      let isOwner = isSignedIn() && request.auth.token.email == 'nadjibullahu@gmail.com';
+      let hasDoc = isSignedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+      return isOwner || (hasDoc && getUserData().role == 'superadmin' && getUserData().status == 'active');
     }
     function isActiveTrainer() {
-      return isSignedIn() && getUserData().role == 'trainer' && getUserData().status == 'active';
+      let hasDoc = isSignedIn() && exists(/databases/$(database)/documents/users/$(request.auth.uid));
+      return hasDoc && getUserData().role == 'trainer' && getUserData().status == 'active';
     }
     function isActiveAdmin() {
       return isSuperAdmin() || isActiveTrainer();
