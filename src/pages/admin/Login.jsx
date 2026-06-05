@@ -136,7 +136,28 @@ export default function AdminLogin() {
             <h2 className="auth-heading">Welcome back</h2>
             <p className="auth-desc">Sign in to manage exams and submissions</p>
 
-            {error && <div className="alert alert-error" role="alert">{error}</div>}
+            {error && (
+              <div className="alert alert-error" role="alert">
+                {error}
+                {error === 'Invalid email or password.' && (
+                  <>
+                    {' '}
+                    <button
+                      type="button"
+                      className="auth-link"
+                      style={{ fontSize: 'inherit', marginLeft: '6px' }}
+                      onClick={() => {
+                        setIsResetMode(true);
+                        setError('');
+                        setSuccess('');
+                      }}
+                    >
+                      Forgot password?
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="auth-form">
               <div className="form-group">
